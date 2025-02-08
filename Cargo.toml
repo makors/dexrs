@@ -1,0 +1,18 @@
+[package]
+name = "dexrs"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[net]
+git-fetch-with-cli = true
+
+[dependencies]
+chrono = "0.4.38"
+phf = { version = "0.11", features = ["macros"]}
+regex = "1.11.0"
+reqwest = { version =  "0.12.8", features = ["cookies", "json", "blocking"] }
+serde = { version = "1.0.210", features = ["derive"] }
+serde_json = "1.0.132"
+uuid = "1.11.0"
