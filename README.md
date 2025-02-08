@@ -1,3 +1,2 @@
 # dexrs
-
-A Rust library for interacting with the Dexcom Share API.
+Rust library for interacting with the Dexcom Share API
