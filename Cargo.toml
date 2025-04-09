@@ -1,18 +1,22 @@
 [package]
 name = "dexrs"
+authors = ["makors"]
+description = "Rust library for fetching Dexcom glucose values"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+license-file = "LICENSE"
+repository = "https://github.com/makors/dexrs"
+readme = "README.md"
+keywords = ["t1d", "diabetes", "dexcom"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[net]
-git-fetch-with-cli = true
-
 [dependencies]
 chrono = "0.4.38"
-phf = { version = "0.11", features = ["macros"]}
+phf = { version = "0.11", features = ["macros"] }
 regex = "1.11.0"
-reqwest = { version =  "0.12.8", features = ["cookies", "json", "blocking"] }
+reqwest = { version = "0.12.8", features = ["cookies", "json", "blocking"] }
 serde = { version = "1.0.210", features = ["derive"] }
 serde_json = "1.0.132"
 uuid = "1.11.0"
