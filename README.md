@@ -2,7 +2,7 @@
 Rust library for interacting with the Dexcom Share API
 
 > [!WARNING]
-> `dexrs` is most definitely still a **work in progress**. If you notice a bug, please open an issue or PR.
+> `dexrs` is most definitely still a **work in progress**. If you notice a bug, please open an issue or PR. We are not affiliated with Dexcom in any way.
 
 ## Installation
 `dexrs` can be installed through Cargo:
