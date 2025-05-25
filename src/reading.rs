@@ -3,6 +3,7 @@ use std::{str::FromStr, sync::OnceLock};
 use regex::Regex;
 
 use crate::dexcom::consts;
+use crate::dexcom::error::DexcomApiError;
 
 use super::trends::TrendData;
 
@@ -21,7 +22,7 @@ impl GlucoseReading<'_> {
         mg_dl: u16,
         trend: TrendData<'a>,
         datetime: String,
-    ) -> Result<GlucoseReading<'a>, &'a str> {
+    ) -> Result<GlucoseReading<'a>, DexcomApiError> {
         let time_regex = TIMEDATE_REGEX.get_or_init(|| {
             Regex::new(r"Date\((?P<timestamp>\d+)(?P<timezone>[+-]\d{4})\)").unwrap()
         });
@@ -55,7 +56,7 @@ impl GlucoseReading<'_> {
                         .to_string(), // readable format for JS
                 })
             }
-            None => Err("invalid datetime format"),
+            None => Err(DexcomApiError::ParseError("invalid datetime format".to_string())),
         }
     }
 }
