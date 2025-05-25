@@ -1,4 +1,5 @@
 use super::consts::{DEXCOM_BASE_URL_NON_US, DEXCOM_BASE_URL_US};
+use super::error::DexcomApiError;
 
 #[derive(Debug)]
 pub struct DexcomClient {
@@ -16,9 +17,9 @@ impl DexcomClient {
         username: String,
         password: String,
         ous: bool,
-    ) -> Result<DexcomClient, &'static str> {
+    ) -> Result<DexcomClient, DexcomApiError> {
         if username.is_empty() || password.is_empty() {
-            return Err("Username and password cannot be empty");
+            return Err(DexcomApiError::MissingCredentials);
         }
 
         let mut dclient = DexcomClient {

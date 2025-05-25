@@ -6,6 +6,7 @@ use crate::{
 };
 
 use super::{client::DexcomClient, consts::DEXCOM_GLUCOSE_DATA_ENDPOINT};
+use super::error::DexcomApiError;
 
 use serde::Deserialize;
 
@@ -25,7 +26,7 @@ impl DexcomClient {
         &self,
         mut minutes: Option<i16>,
         mut max_count: Option<i16>,
-    ) -> Result<Vec<GlucoseReading>, Box<dyn std::error::Error>> {
+    ) -> Result<Vec<GlucoseReading>, DexcomApiError> {
         // guard clauses
         if minutes > Some(1440) || minutes < Some(1) || minutes.is_none() {
             minutes = Some(1440);
@@ -36,7 +37,7 @@ impl DexcomClient {
         }
 
         if self.account_id.is_none() || self.session_id.is_none() {
-            return Err("Session ID or Account ID is missing".into());
+            return Err(DexcomApiError::SessionError("Session ID or Account ID is missing".to_string()));
         }
 
         let minutes = minutes.unwrap().to_string();
@@ -51,13 +52,14 @@ impl DexcomClient {
 
         let resp: Vec<GlucoseResp> = self
             .post(DEXCOM_GLUCOSE_DATA_ENDPOINT, json!({}), params)
-            .unwrap()
+            .map_err(|e| DexcomApiError::HttpError(e.to_string()))?
             .json()
-            .unwrap();
+            .map_err(|e| DexcomApiError::ParseError(e.to_string()))?;
 
         for reading in resp {
             readings.push(
-                GlucoseReading::new(reading.value, get_trend(reading.trend), reading.dt).unwrap(),
+                GlucoseReading::new(reading.value, get_trend(reading.trend), reading.dt)
+                    .map_err(|e| DexcomApiError::ParseError(e.to_string()))?,
             );
         }
 
