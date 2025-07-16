@@ -1,6 +1,6 @@
 use std::fmt;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum DexcomApiError {
     LoginError(String),
     SessionError(String),
@@ -10,11 +10,14 @@ pub enum DexcomApiError {
     MissingCredentials,
     InvalidAccountId,
     InvalidSessionId,
+    RateLimitExceeded,
+    NetworkError(String),
+    TimeoutError,
+    InvalidInput(String),
     Other(String),
 }
 
 impl fmt::Display for DexcomApiError {
-    // our function to actually print it out
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             DexcomApiError::LoginError(msg) => write!(f, "Login error: {}", msg),
@@ -25,9 +28,41 @@ impl fmt::Display for DexcomApiError {
             DexcomApiError::MissingCredentials => write!(f, "Missing username or password"),
             DexcomApiError::InvalidAccountId => write!(f, "Invalid account ID returned by API"),
             DexcomApiError::InvalidSessionId => write!(f, "Invalid session ID returned by API"),
+            DexcomApiError::RateLimitExceeded => write!(f, "Rate limit exceeded, please wait before retrying"),
+            DexcomApiError::NetworkError(msg) => write!(f, "Network error: {}", msg),
+            DexcomApiError::TimeoutError => write!(f, "Request timed out"),
+            DexcomApiError::InvalidInput(msg) => write!(f, "Invalid input: {}", msg),
             DexcomApiError::Other(msg) => write!(f, "Other error: {}", msg),
         }
     }
 }
 
-impl std::error::Error for DexcomApiError {}
+impl std::error::Error for DexcomApiError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        None
+    }
+}
+
+impl From<reqwest::Error> for DexcomApiError {
+    fn from(err: reqwest::Error) -> Self {
+        if err.is_timeout() {
+            DexcomApiError::TimeoutError
+        } else if err.is_connect() {
+            DexcomApiError::NetworkError("Connection failed".to_string())
+        } else {
+            DexcomApiError::HttpError(err.to_string())
+        }
+    }
+}
+
+impl From<serde_json::Error> for DexcomApiError {
+    fn from(err: serde_json::Error) -> Self {
+        DexcomApiError::ParseError(err.to_string())
+    }
+}
+
+impl From<std::io::Error> for DexcomApiError {
+    fn from(err: std::io::Error) -> Self {
+        DexcomApiError::NetworkError(err.to_string())
+    }
+}
