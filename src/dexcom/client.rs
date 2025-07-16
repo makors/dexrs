@@ -35,10 +35,10 @@ impl DexcomClient {
             reqwest_client: reqwest::blocking::Client::builder()
                 .cookie_store(true)
                 .build()
-                .unwrap(),
+                .map_err(|e| DexcomApiError::Other(format!("Failed to build HTTP client: {}", e)))?,
         };
 
-        dclient.create_session().unwrap();
+        dclient.create_session()?;
 
         Ok(dclient)
     }

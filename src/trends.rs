@@ -16,7 +16,10 @@ impl<'b> TrendData<'b> {
 }
 
 pub fn get_trend<'c>(t: String) -> TrendData<'c> {
-    TRENDS.get(&t).cloned().unwrap()
+    TRENDS.get(&t).cloned().unwrap_or_else(|| {
+        // Return a default trend for unknown values instead of panicking
+        TrendData::new(8, "Unknown trend", "?")
+    })
 }
 
 static TRENDS: phf::Map<&'static str, TrendData> = phf::phf_map! {

@@ -10,11 +10,11 @@ impl DexcomClient {
             self.account_id = Some(self.get_account_id()?);
         }
 
-        let account_id = self.account_id.as_ref().unwrap().as_str();
+        let account_id = self.account_id.as_ref()
+            .ok_or_else(|| DexcomApiError::InvalidAccountId)?;
 
         // validate account id
-        if self.account_id.is_none()
-            || Uuid::parse_str(account_id).is_err()
+        if Uuid::parse_str(account_id).is_err()
             || self.account_id.as_deref() == Some(consts::DEXCOM_NULL_UUID)
         {
             return Err(DexcomApiError::InvalidAccountId);
@@ -24,10 +24,10 @@ impl DexcomClient {
         self.session_id = Some(self.get_session_id()?);
 
         // validate session id
-        let session_id = self.session_id.as_ref().unwrap().as_str();
+        let session_id = self.session_id.as_ref()
+            .ok_or_else(|| DexcomApiError::InvalidSessionId)?;
 
-        if self.session_id.is_none()
-            || Uuid::parse_str(session_id).is_err()
+        if Uuid::parse_str(session_id).is_err()
             || self.session_id.as_deref() == Some(consts::DEXCOM_NULL_UUID)
         {
             return Err(DexcomApiError::InvalidSessionId);
@@ -49,7 +49,11 @@ impl DexcomClient {
         );
 
         match account_response {
-            Ok(r) => Ok(r.text().unwrap().replace("\"", "")),
+            Ok(r) => {
+                let text = r.text()
+                    .map_err(|e| DexcomApiError::ParseError(format!("Failed to read response text: {}", e)))?;
+                Ok(text.replace("\"", ""))
+            },
             Err(e) => Err(DexcomApiError::LoginError(e.to_string())),
         }
     }
@@ -67,7 +71,11 @@ impl DexcomClient {
         );
 
         match session_response {
-            Ok(r) => Ok(r.text().unwrap().replace("\"", "")),
+            Ok(r) => {
+                let text = r.text()
+                    .map_err(|e| DexcomApiError::ParseError(format!("Failed to read response text: {}", e)))?;
+                Ok(text.replace("\"", ""))
+            },
             Err(e) => Err(DexcomApiError::SessionError(e.to_string())),
         }
     }

@@ -44,8 +44,11 @@ impl DexcomClient {
         let max_count = max_count.unwrap().to_string();
 
         let mut readings: Vec<GlucoseReading> = vec![];
+        let session_id = self.session_id.as_ref()
+            .ok_or_else(|| DexcomApiError::SessionError("Session ID is missing".to_string()))?;
+            
         let params = vec![
-            ("sessionId", self.session_id.as_ref().unwrap().as_str()),
+            ("sessionId", session_id.as_str()),
             ("minutes", minutes.as_str()),
             ("maxCount", max_count.as_str()),
         ];
