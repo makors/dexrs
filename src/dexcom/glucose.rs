@@ -26,7 +26,7 @@ impl DexcomClient {
         &self,
         mut minutes: Option<i16>,
         mut max_count: Option<i16>,
-    ) -> Result<Vec<GlucoseReading>, DexcomApiError> {
+    ) -> Result<Vec<GlucoseReading<'static>>, DexcomApiError> {
         // guard clauses
         if minutes > Some(1440) || minutes < Some(1) || minutes.is_none() {
             minutes = Some(1440);
