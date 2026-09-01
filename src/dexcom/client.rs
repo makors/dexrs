@@ -17,9 +17,9 @@ impl DexcomClient {
         username: String,
         password: String,
         ous: bool,
-    ) -> Result<DexcomClient, DexcomApiError> {
+    ) -> Result<DexcomClient, &'static str> {
         if username.is_empty() || password.is_empty() {
-            return Err(DexcomApiError::MissingCredentials);
+            return Err("Username and password cannot be empty");
         }
 
         let mut dclient = DexcomClient {
@@ -35,10 +35,10 @@ impl DexcomClient {
             reqwest_client: reqwest::blocking::Client::builder()
                 .cookie_store(true)
                 .build()
-                .unwrap(),
+                .unwrap()
         };
 
-        dclient.create_session().unwrap();
+        dclient.create_session()?;
 
         Ok(dclient)
     }
