@@ -21,5 +21,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
-      - run: cargo build --verbose
-      - run: cargo test --verbose
+      - run: cargo +${{ matrix.toolchain }} build --locked --all-targets --verbose
+      - run: cargo +${{ matrix.toolchain }} test --locked --verbose

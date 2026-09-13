@@ -1,11 +1,19 @@
 use dexrs::dexcom::client::DexcomClient;
 use std::env;
 
-pub fn main() {
-    let client = DexcomClient::new(env::var("DEXCOM_USERNAME").unwrap(), env::var("DEXCOM_PASSWORD").unwrap(), false).unwrap();
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = DexcomClient::new(
+        env::var("DEXCOM_USERNAME")?,
+        env::var("DEXCOM_PASSWORD")?,
+        false, // true for accounts outside the US
+    )?;
 
-    let values = client.get_glucose_readings(None, None).unwrap();
-    for v in values {
-        println!("MG/DL: {}, Trend: {}, Time: {}", v.mg_dl, v.trend.arrow, v.datetime);
+    for reading in client.get_glucose_readings(None, None)? {
+        println!(
+            "{} mg/dL ({:.1} mmol/L) {} at {}",
+            reading.mg_dl, reading.mmol_l, reading.trend.arrow, reading.datetime,
+        );
     }
+
+    Ok(())
 }
