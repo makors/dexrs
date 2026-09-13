@@ -2,7 +2,7 @@
 name = "dexrs"
 authors = ["makors"]
 description = "Rust library for fetching Dexcom glucose values"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 license-file = "LICENSE"
 repository = "https://github.com/makors/dexrs"
