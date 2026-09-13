@@ -2,14 +2,12 @@
 name = "dexrs"
 authors = ["makors"]
 description = "Rust library for fetching Dexcom glucose values"
-version = "0.1.2"
-edition = "2021"
+version = "0.1.3"
+edition = "2024"
 license-file = "LICENSE"
 repository = "https://github.com/makors/dexrs"
 readme = "README.md"
 keywords = ["t1d", "diabetes", "dexcom"]
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 chrono = "0.4.38"

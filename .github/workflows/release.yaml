@@ -43,8 +43,8 @@ jobs:
               raise SystemExit(f"Release tag {actual!r} must match {expected!r}")
           PY
 
-      - name: Install stable Rust
-        run: rustup update stable && rustup default stable
+      - name: Install repository Rust toolchain
+        run: rustup show
 
       - name: Test release
         run: cargo test --locked --all-targets

@@ -1,33 +1,56 @@
-# dexrs 🩸🍭
-Rust library for interacting with the Dexcom Share API
+# dexrs
 
-> [!WARNING]
-> `dexrs` is most definitely still a **work in progress**. If you notice a bug, please open an issue or PR. We are not affiliated with Dexcom in any way.
+A small Rust library for reading glucose data from the Dexcom Share API.
+Uses blocking HTTP requests. Not affiliated with Dexcom.
 
-## Installation
-`dexrs` can be installed through Cargo:
-```
+## Install
+
+```sh
 cargo add dexrs
 ```
 
-## Usage
-You can use `dexrs` by implementing the code below. See [/examples](https://github.com/makors/dexrs/tree/main/examples) for more examples.
+## Read the latest value
+
+Set `DEXCOM_USERNAME` and `DEXCOM_PASSWORD` in your environment, then:
+
 ```rust
 use dexrs::dexcom::client::DexcomClient;
 use std::env;
 
-pub fn main() {
-    let client = DexcomClient::new(env::var("DEXCOM_USERNAME").unwrap(), env::var("DEXCOM_PASSWORD").unwrap(), false).unwrap();
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let client = DexcomClient::new(
+        env::var("DEXCOM_USERNAME")?,
+        env::var("DEXCOM_PASSWORD")?,
+        false, // true for accounts outside the US
+    )?;
 
-    let values = client.get_glucose_readings(None, None).unwrap();
-    for v in values {
-        println!("MG/DL: {}, Trend: {}, Time: {}", v.mg_dl, v.trend.arrow, v.datetime);
+    for reading in client.get_glucose_readings(None, None)? {
+        println!(
+            "{} mg/dL ({:.1} mmol/L) {} at {}",
+            reading.mg_dl, reading.mmol_l, reading.trend.arrow, reading.datetime,
+        );
     }
+
+    Ok(())
 }
 ```
 
-## Contributing
-If you wish to contribute improvements, bug fixes, or even new features, feel free to open a PR. *Everyone* is welcome to contribute.
+`get_glucose_readings(minutes, max_count)` defaults to one reading from the last
+24 hours. For more history, pass values such as `Some(60), Some(12)`. The limits
+are 1–1440 minutes and 1–288 readings. The account needs Dexcom Share enabled.
 
-## License
-Everything is licensed under MIT. See [LICENSE](https://github.com/makors/dexrs/tree/main/LICENSE) for more.
+The same example is in [`examples/simple_reading.rs`](examples/simple_reading.rs).
+Run it with `cargo run --example simple_reading`.
+
+## Development
+
+The repo uses Rust 1.98.1 and the 2024 edition. Rustup picks up the toolchain from
+`rust-toolchain.toml`.
+
+```sh
+cargo test --locked --all-targets
+```
+
+Issues and pull requests are welcome. See [RELEASING.md](RELEASING.md) for releases.
+
+MIT licensed. See [LICENSE](LICENSE).
