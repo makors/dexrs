@@ -38,7 +38,7 @@ impl DexcomClient {
                 .unwrap(),
         };
 
-        dclient.create_session().unwrap();
+        dclient.create_session()?;
 
         Ok(dclient)
     }
